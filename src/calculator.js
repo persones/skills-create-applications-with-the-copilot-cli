@@ -6,15 +6,21 @@
  *   - subtraction    (subtract)
  *   - multiplication (multiply)
  *   - division       (divide)
+ *   - modulo         (modulo)
+ *   - exponentiation (power)
+ *   - square root    (squareRoot)
  *
  * Usage:
- *   node calculator.js <operation> <num1> <num2>
+ *   node calculator.js <operation> <num1> [num2]
  *
  * Examples:
- *   node calculator.js add 5 3        => 8
- *   node calculator.js subtract 10 4  => 6
- *   node calculator.js multiply 6 7   => 42
- *   node calculator.js divide 20 4    => 5
+ *   node calculator.js add 5 3           => 8
+ *   node calculator.js subtract 10 4     => 6
+ *   node calculator.js multiply 6 7      => 42
+ *   node calculator.js divide 20 4       => 5
+ *   node calculator.js modulo 10 3       => 1
+ *   node calculator.js power 2 8         => 256
+ *   node calculator.js squareRoot 25     => 5
  */
 
 // Addition: returns the sum of a and b
@@ -41,19 +47,41 @@ function divide(a, b) {
   return a / b;
 }
 
-module.exports = { add, subtract, multiply, divide };
+// Modulo: returns the remainder of a divided by b
+function modulo(a, b) {
+  return a % b;
+}
+
+// Power: returns base raised to the exponent
+function power(base, exponent) {
+  return base ** exponent;
+}
+
+// Square Root: returns the square root of n
+// Returns an error message if n is negative
+function squareRoot(n) {
+  if (n < 0) {
+    return "Error: Square root of a negative number is not allowed.";
+  }
+  return Math.sqrt(n);
+}
+
+module.exports = { add, subtract, multiply, divide, modulo, power, squareRoot };
 
 // Only run CLI logic when executed directly (not when imported by tests)
 if (require.main === module) {
-// Parse CLI arguments: node calculator.js <operation> <num1> <num2>
+// Parse CLI arguments: node calculator.js <operation> <num1> [num2]
 const [, , operation, arg1, arg2] = process.argv;
 
 const a = parseFloat(arg1);
 const b = parseFloat(arg2);
 
-if (!operation || isNaN(a) || isNaN(b)) {
-  console.log("Usage: node calculator.js <operation> <num1> <num2>");
-  console.log("Operations: add, subtract, multiply, divide");
+const unaryOps = ["squareroot"];
+const isUnary = unaryOps.includes((operation || "").toLowerCase());
+
+if (!operation || isNaN(a) || (!isUnary && isNaN(b))) {
+  console.log("Usage: node calculator.js <operation> <num1> [num2]");
+  console.log("Operations: add, subtract, multiply, divide, modulo, power, squareRoot");
   process.exit(1);
 }
 
@@ -72,9 +100,20 @@ switch (operation.toLowerCase()) {
   case "divide":
     result = divide(a, b);
     break;
+  case "modulo":
+    result = modulo(a, b);
+    break;
+  case "power":
+    result = power(a, b);
+    break;
+  case "squareroot":
+    result = squareRoot(a);
+    console.log(`squareRoot(${a}) = ${result}`);
+    process.exit(0);
+    break;
   default:
     console.log(`Unknown operation: "${operation}"`);
-    console.log("Supported operations: add, subtract, multiply, divide");
+    console.log("Supported operations: add, subtract, multiply, divide, modulo, power, squareRoot");
     process.exit(1);
 }
 
